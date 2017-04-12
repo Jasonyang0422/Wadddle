@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ import jiachengyang.nyu.mydribbble.view.base.SpaceItemDecoration;
 
 public class ShotListFragment extends Fragment {
 
-    @BindView(R.id.shot_list_recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
 
     private ShotListAdapter shotListAdapter;
     private final int COUNT_PER_PAGE = 20;
@@ -37,7 +36,7 @@ public class ShotListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_shot_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_recycler_view, container, false);
         ButterKnife.bind(this, view);
         return view;
     }

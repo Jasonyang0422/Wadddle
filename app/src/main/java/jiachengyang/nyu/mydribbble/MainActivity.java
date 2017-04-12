@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jiachengyang.nyu.mydribbble.view.bucket_list.BucketListFragment;
 import jiachengyang.nyu.mydribbble.view.shot_list.ShotListFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                         setTitle("Likes");
                         break;
                     case R.id.navigation_view_menu_buckets:
-                        Toast.makeText(MainActivity.this, "Welcome to Buckets!", Toast.LENGTH_LONG).show();
+                        fragment = BucketListFragment.newInstance();
                         setTitle("Buckets");
                         break;
                 }
