@@ -7,4 +7,8 @@
 
     <string name="open_drawer">open drawer</string>
     <string name="close_drawer">close drawer</string>
+
+    <string name="activity_login_btn_text">LOG INTO WADDDLE</string>
+
+    <string name="auth_activity_title">Log into Dribbble</string>
 </resources>
