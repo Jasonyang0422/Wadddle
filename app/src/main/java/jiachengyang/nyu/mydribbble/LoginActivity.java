@@ -8,8 +8,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jiachengyang.nyu.mydribbble.auth.Auth;
+import jiachengyang.nyu.mydribbble.dribbble.Dribbble;
 
 public class LoginActivity extends AppCompatActivity{
 
@@ -38,10 +42,26 @@ public class LoginActivity extends AppCompatActivity{
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQ_CODE && resultCode == RESULT_OK) {
-            String authCode = data.getStringExtra(AuthActivity.KEY_CODE);
-            Log.i("jason-authcode", authCode);
+            final String authCode = data.getStringExtra(AuthActivity.KEY_CODE);
+            Log.i("authcode", authCode);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // this is a network call and it's time consuming
+                        String accessToken = Auth.fetchAccessToken(authCode);
 
-            //继续往下之前先看exception视频
+                        //network to get user and store accessToken and user to SharedPreferences
+                        Dribbble.login(LoginActivity.this, accessToken);
+
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish(); //end dialogs
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
     }
 }
