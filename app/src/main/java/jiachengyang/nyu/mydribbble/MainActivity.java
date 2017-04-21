@@ -1,5 +1,6 @@
 package jiachengyang.nyu.mydribbble;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -11,10 +12,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jiachengyang.nyu.mydribbble.dribbble.Dribbble;
 import jiachengyang.nyu.mydribbble.view.bucket_list.BucketListFragment;
 import jiachengyang.nyu.mydribbble.view.shot_list.ShotListFragment;
 
@@ -81,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                //if current checked item is clicked
                 if(item.isChecked()) {
                     drawerLayout.closeDrawers();
                     return true;
@@ -113,6 +121,29 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 return true;
+            }
+        });
+
+        setupNavHeader();
+    }
+
+    private void setupNavHeader() {
+        View headerView = navigationView.getHeaderView(0);
+
+        ((TextView) headerView.findViewById(R.id.nav_view_header_user_name))
+                .setText(Dribbble.getCurrentUser().name);
+
+        ((SimpleDraweeView) headerView.findViewById(R.id.nav_view_header_user_pricture))
+                .setImageURI(Dribbble.getCurrentUser().avatar_url);
+
+        headerView.findViewById(R.id.nav_view_header_logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dribbble.logout(MainActivity.this);
+
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }

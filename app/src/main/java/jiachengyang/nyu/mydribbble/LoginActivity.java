@@ -28,13 +28,21 @@ public class LoginActivity extends AppCompatActivity{
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, AuthActivity.class);
-                startActivityForResult(intent, REQ_CODE);
-            }
-        });
+        Dribbble.init(this);
+
+        if(Dribbble.isLoggedIn()) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }else {
+            loginBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(LoginActivity.this, AuthActivity.class);
+                    startActivityForResult(intent, REQ_CODE);
+                }
+            });
+        }
     }
 
     @Override
@@ -43,7 +51,6 @@ public class LoginActivity extends AppCompatActivity{
 
         if (requestCode == REQ_CODE && resultCode == RESULT_OK) {
             final String authCode = data.getStringExtra(AuthActivity.KEY_CODE);
-            Log.i("authcode", authCode);
             new Thread(new Runnable() {
                 @Override
                 public void run() {

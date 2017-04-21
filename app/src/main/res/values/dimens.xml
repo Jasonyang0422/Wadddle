@@ -8,4 +8,7 @@
 
     <dimen name="navigation_view_header_height">192dp</dimen>
 
+    <dimen name="shot_author_picture_size">48dp</dimen>
+    <dimen name="shot_author_picture_radius">24dp</dimen>
+
 </resources>
