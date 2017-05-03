@@ -7,7 +7,9 @@ import android.util.Log;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.util.List;
 
+import jiachengyang.nyu.mydribbble.model.Shot;
 import jiachengyang.nyu.mydribbble.model.User;
 import jiachengyang.nyu.mydribbble.utils.ModelUtils;
 import okhttp3.OkHttpClient;
@@ -19,6 +21,7 @@ public class Dribbble {
     private static final String API_URL = "https://api.dribbble.com/v1/";
 
     private static final String USER_END_POINT = API_URL + "user";
+    private static final String SHOTS_END_POINT = API_URL + "shots";
 
     private static String SP_AUTH = "auth"; //preference file name
 
@@ -29,6 +32,7 @@ public class Dribbble {
     private static User user;
 
     private static final TypeToken<User> USER_TYPE_TOKEN = new TypeToken<User>(){};
+    private static final TypeToken<List<Shot>> SHOT_LIST_TYPE_TOKEN = new TypeToken<List<Shot>>(){};
 
     public static void init(Context context) {
         accessToken = loadAccessToken(context);
@@ -93,5 +97,18 @@ public class Dribbble {
 
     public static User loadUser(Context context) {
         return ModelUtils.read(context, KEY_USER, USER_TYPE_TOKEN);
+    }
+
+    public static List<Shot> getShots(int page) throws IOException {
+        String url = SHOTS_END_POINT + "?page=" + page;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        String responseString = response.body().string();
+
+        return ModelUtils.toObject(responseString, SHOT_LIST_TYPE_TOKEN);
     }
 }

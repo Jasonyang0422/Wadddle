@@ -1,9 +1,13 @@
 package jiachengyang.nyu.mydribbble.view.shot_list;
 
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
 
 import java.util.List;
 
@@ -53,10 +57,16 @@ public class ShotListAdapter extends RecyclerView.Adapter {
             Shot shot = shots.get(position);
             ShotViewHolder shotViewHolder = (ShotViewHolder) holder;
 
-            shotViewHolder.shotImage.setImageResource(R.drawable.shot_image_placeholder);
             shotViewHolder.shotViewedCount.setText(shot.views_count + "");
             shotViewHolder.shotLikeCount.setText(shot.likes_count + "");
             shotViewHolder.shotBucketCount.setText(shot.buckets_count + "");
+
+            // play gif or animations automatically
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setUri(Uri.parse(shot.getImageUrl()))
+                    .setAutoPlayAnimations(true)
+                    .build();
+            shotViewHolder.shotImage.setController(controller);
         }
 
     }

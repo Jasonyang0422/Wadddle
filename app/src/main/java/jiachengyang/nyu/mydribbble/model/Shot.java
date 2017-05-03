@@ -4,6 +4,9 @@ import java.util.Map;
 
 public class Shot {
 
+    public static final String IMAGE_NORMAL = "normal";
+    public static final String IMAGE_HIDPI = "hidpi";
+
     public String id;
     public String title;
     public String description;
@@ -20,4 +23,14 @@ public class Shot {
 
     public User user;
 
+    public String getImageUrl() {
+        if (images == null) {
+            return "";
+        }
+
+        String url = images.containsKey(IMAGE_HIDPI)
+                ? images.get(IMAGE_HIDPI)
+                : images.get(IMAGE_NORMAL);
+        return url == null ? "" : url;
+    }
 }
