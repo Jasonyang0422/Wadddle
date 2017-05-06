@@ -1,5 +1,7 @@
 package jiachengyang.nyu.mydribbble.view.shot_list;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,11 +10,15 @@ import android.view.ViewGroup;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 
 import jiachengyang.nyu.mydribbble.R;
 import jiachengyang.nyu.mydribbble.model.Shot;
+import jiachengyang.nyu.mydribbble.utils.ModelUtils;
+import jiachengyang.nyu.mydribbble.view.shot_detail.ShotDetailActivity;
+import jiachengyang.nyu.mydribbble.view.shot_detail.ShotDetailFragment;
 
 public class ShotListAdapter extends RecyclerView.Adapter {
 
@@ -54,7 +60,7 @@ public class ShotListAdapter extends RecyclerView.Adapter {
         if(viewType == VIEW_TYPE_LOADING) {
             loadMoreListener.onLoadMore();
         }else {
-            Shot shot = shots.get(position);
+            final Shot shot = shots.get(position);
             ShotViewHolder shotViewHolder = (ShotViewHolder) holder;
 
             shotViewHolder.shotViewedCount.setText(shot.views_count + "");
@@ -67,6 +73,18 @@ public class ShotListAdapter extends RecyclerView.Adapter {
                     .setAutoPlayAnimations(true)
                     .build();
             shotViewHolder.shotImage.setController(controller);
+
+            shotViewHolder.cover.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, ShotDetailActivity.class);
+                    intent.putExtra(ShotDetailFragment.KEY_SHOT_DETAIL,
+                            ModelUtils.toString(shot, new TypeToken<Shot>(){}));
+                    intent.putExtra(ShotDetailActivity.KEY_SHOT_TITLE, shot.title);
+                    context.startActivity(intent);
+                }
+            });
         }
 
     }
