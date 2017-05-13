@@ -1,5 +1,6 @@
 package jiachengyang.nyu.mydribbble.view.bucket_list;
 
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,6 +24,8 @@ public class BucketListFragment extends Fragment {
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
 
+    BucketListAdapter adapter;
+
     public static BucketListFragment newInstance() {
         return new BucketListFragment();
     }
@@ -41,13 +44,36 @@ public class BucketListFragment extends Fragment {
         recyclerView.addItemDecoration(new SpaceItemDecoration(
                 getResources().getDimensionPixelSize(R.dimen.spacing_medium)));
 
-        recyclerView.setAdapter(new BuckListAdapter(fakeData()));
+        final Handler handler = new Handler();
+        adapter = new BucketListAdapter(new ArrayList<Bucket>(), new BucketListAdapter.LoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            this.sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.append(fakeData(12));
+                            }
+                        });
+                    }
+                }.start();
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
     }
 
-    private List<Bucket> fakeData() {
+    private List<Bucket> fakeData(int num) {
         List<Bucket> bucketList = new ArrayList<>();
         Random random = new Random();
-        for (int i = 0; i < 20; ++i) {
+        for (int i = 0; i < num; ++i) {
             Bucket bucket = new Bucket();
             bucket.name = "Bucket" + i;
             bucket.shots_count = random.nextInt(10);
