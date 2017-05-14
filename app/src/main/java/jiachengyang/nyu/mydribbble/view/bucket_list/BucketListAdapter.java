@@ -47,6 +47,7 @@ public class BucketListAdapter extends RecyclerView.Adapter {
             BucketViewHolder bucketViewHolder = (BucketViewHolder) holder;
             bucketViewHolder.bucketName.setText(buckets.get(position).name);
             bucketViewHolder.bucketShotCount.setText(buckets.get(position).shots_count + "shots");
+            bucketViewHolder.bucketCheckBox.setVisibility(View.GONE);
         }
     }
 

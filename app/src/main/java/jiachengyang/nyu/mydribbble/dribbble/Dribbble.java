@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.util.List;
 
+import jiachengyang.nyu.mydribbble.model.Bucket;
 import jiachengyang.nyu.mydribbble.model.Shot;
 import jiachengyang.nyu.mydribbble.model.User;
 import jiachengyang.nyu.mydribbble.utils.ModelUtils;
@@ -33,6 +34,7 @@ public class Dribbble {
 
     private static final TypeToken<User> USER_TYPE_TOKEN = new TypeToken<User>(){};
     private static final TypeToken<List<Shot>> SHOT_LIST_TYPE_TOKEN = new TypeToken<List<Shot>>(){};
+    private static final TypeToken<List<Bucket>> BUCKET_LIST_TYPE_TOKEN = new TypeToken<List<Bucket>>(){};
 
     public static void init(Context context) {
         accessToken = loadAccessToken(context);
@@ -110,5 +112,19 @@ public class Dribbble {
         String responseString = response.body().string();
 
         return ModelUtils.toObject(responseString, SHOT_LIST_TYPE_TOKEN);
+    }
+
+    public static List<Bucket> getUserBuckets(int page) throws IOException {
+        String url = USER_END_POINT + "/" + "buckets?page=" + page;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        String responseString = response.body().string();
+
+        //如果某page是空的，response是[]，而不是null
+        return ModelUtils.toObject(responseString, BUCKET_LIST_TYPE_TOKEN);
     }
 }
