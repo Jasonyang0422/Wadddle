@@ -13,6 +13,7 @@ import jiachengyang.nyu.mydribbble.model.Bucket;
 import jiachengyang.nyu.mydribbble.model.Shot;
 import jiachengyang.nyu.mydribbble.model.User;
 import jiachengyang.nyu.mydribbble.utils.ModelUtils;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -23,11 +24,14 @@ public class Dribbble {
 
     private static final String USER_END_POINT = API_URL + "user";
     private static final String SHOTS_END_POINT = API_URL + "shots";
+    private static final String BUCKETS_END_POINT = API_URL + "buckets";
 
     private static String SP_AUTH = "auth"; //preference file name
 
     private static String KEY_ACCESS_TOKEN = "access_token";
     private static String KEY_USER = "user";
+    private static String KEY_BUCKET_NAME = "name";
+    private static String KEY_BUKCET_DESCRIPTION = "description";
 
     private static String accessToken;
     private static User user;
@@ -35,6 +39,7 @@ public class Dribbble {
     private static final TypeToken<User> USER_TYPE_TOKEN = new TypeToken<User>(){};
     private static final TypeToken<List<Shot>> SHOT_LIST_TYPE_TOKEN = new TypeToken<List<Shot>>(){};
     private static final TypeToken<List<Bucket>> BUCKET_LIST_TYPE_TOKEN = new TypeToken<List<Bucket>>(){};
+    private static final TypeToken<Bucket> BUCKET_TYPE_TOKEN = new TypeToken<Bucket>(){};
 
     public static void init(Context context) {
         accessToken = loadAccessToken(context);
@@ -126,5 +131,25 @@ public class Dribbble {
 
         //如果某page是空的，response是[]，而不是null
         return ModelUtils.toObject(responseString, BUCKET_LIST_TYPE_TOKEN);
+    }
+
+    public static Bucket createBucket(String name, String description) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        FormBody formBody = new FormBody.Builder()
+                .add(KEY_BUCKET_NAME, name)
+                .add(KEY_BUKCET_DESCRIPTION, description)
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .url(BUCKETS_END_POINT)
+                .post(formBody)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        String responseString = response.body().string();
+
+        return ModelUtils.toObject(responseString, BUCKET_TYPE_TOKEN);
     }
 }

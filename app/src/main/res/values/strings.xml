@@ -20,4 +20,11 @@
     <string name="bucket">Bucket</string>
 
     <string name="share_shot">Share this amazing shot!</string>
+
+    <string name="new_bucket_name">Bucket Name</string>
+    <string name="new_bucket_description">Bucket Description</string>
+    <string name="new_bucket_title">New Bucket</string>
+    <string name="new_bucket_create">Create</string>
+    <string name="new_bucket_cancel">Cancel</string>
+
 </resources>

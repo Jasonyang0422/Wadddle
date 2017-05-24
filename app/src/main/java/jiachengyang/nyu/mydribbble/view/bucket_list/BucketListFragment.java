@@ -1,5 +1,7 @@
 package jiachengyang.nyu.mydribbble.view.bucket_list;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,8 @@ import android.view.ViewGroup;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -32,6 +37,7 @@ public class BucketListFragment extends Fragment {
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fab) FloatingActionButton floatingActionButton;
 
+    public static final int REQ_CODE_NEW_BUCKET = 100;
     final private int COUNT_PER_PAGE = 12;
     BucketListAdapter adapter;
 
@@ -65,11 +71,27 @@ public class BucketListFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                Snackbar.make(v, "Fab Clicked", Snackbar.LENGTH_LONG).show();
+                //https://guides.codepath.com/android/Using-DialogFragment
+                //Passing data to parent fragment
+                NewBucketDialogFragment newBucketDialogFragment = NewBucketDialogFragment.newInstance();
+                newBucketDialogFragment.setTargetFragment(BucketListFragment.this, REQ_CODE_NEW_BUCKET);
+                newBucketDialogFragment.show(getFragmentManager(), NewBucketDialogFragment.TAG);
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQ_CODE_NEW_BUCKET && resultCode == Activity.RESULT_OK) {
+            String bucketName = data.getStringExtra(NewBucketDialogFragment.KEY_BUCKET_NAME);
+            String bucketDescription = data.getStringExtra(NewBucketDialogFragment.KEY_BUCKET_DESCRIPTION);
+            if (!TextUtils.isEmpty(bucketName)) {
+                AsyncTaskCompat.executeParallel(new CreateBucketTask(bucketName, bucketDescription));
+            }
+        }
     }
 
     private class LoadBucketTask extends AsyncTask<Void, Void, List<Bucket>> {
@@ -101,4 +123,36 @@ public class BucketListFragment extends Fragment {
 
         }
     }
+
+    private class CreateBucketTask extends AsyncTask<Void, Void, Bucket> {
+
+        private String name;
+        private String description;
+
+        public CreateBucketTask(String name, String description) {
+            this.name = name;
+            this.description =description;
+        }
+
+        @Override
+        protected Bucket doInBackground(Void... params) {
+            try {
+                return Dribbble.createBucket(name, description);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Bucket bucket) {
+            // this method is executed on UI thread!!!!
+            if(bucket != null) {
+                adapter.prepend(Collections.singletonList(bucket));
+            }else {
+                Snackbar.make(getView(), "Error!", Snackbar.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }
