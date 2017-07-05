@@ -27,4 +27,8 @@
     <string name="new_bucket_create">Create</string>
     <string name="new_bucket_cancel">Cancel</string>
 
+    <string name="choose_bucket">Choose Bucket</string>
+
+    <string name="save">save</string>
+
 </resources>

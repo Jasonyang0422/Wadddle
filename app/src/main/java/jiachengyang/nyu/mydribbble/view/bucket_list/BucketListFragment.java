@@ -15,6 +15,9 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -39,10 +42,50 @@ public class BucketListFragment extends Fragment {
 
     public static final int REQ_CODE_NEW_BUCKET = 100;
     final private int COUNT_PER_PAGE = 12;
-    BucketListAdapter adapter;
+    public static final String KEY_CHOOSING_MODE = "choose_mode";
+    public static final String KEY_CHOSEN_BUCKET_IDS = "chosen_bucket_ids";
 
-    public static BucketListFragment newInstance() {
-        return new BucketListFragment();
+    private BucketListAdapter adapter;
+    private boolean isChoosingMode;
+    private List<String> chosenBucketIds;
+
+
+    public static BucketListFragment newInstance(boolean isChoosingMode, ArrayList<String> chosenBucketIds) {
+        Bundle args = new Bundle();
+        args.putBoolean(KEY_CHOOSING_MODE, isChoosingMode);
+        args.putStringArrayList(KEY_CHOSEN_BUCKET_IDS, chosenBucketIds);
+
+        BucketListFragment fragment = new BucketListFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if(isChoosingMode) {
+            inflater.inflate(R.menu.bucket_list_choose_mode_menu, menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.save) {
+            ArrayList<String> chosenBucketIds = adapter.getSelectedBucketIds();
+
+            Intent intent = new Intent();
+            intent.putStringArrayListExtra(KEY_CHOSEN_BUCKET_IDS, chosenBucketIds);
+            getActivity().setResult(Activity.RESULT_OK, intent);
+            getActivity().finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Nullable
@@ -55,18 +98,25 @@ public class BucketListFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        isChoosingMode = getArguments().getBoolean(KEY_CHOOSING_MODE);
+        if(isChoosingMode) {
+            chosenBucketIds = getArguments().getStringArrayList(KEY_CHOSEN_BUCKET_IDS);
+            if(chosenBucketIds == null) {
+                chosenBucketIds = new ArrayList<>();
+            }
+        }
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new SpaceItemDecoration(
                 getResources().getDimensionPixelSize(R.dimen.spacing_medium)));
 
-        final Handler handler = new Handler();
         adapter = new BucketListAdapter(new ArrayList<Bucket>(), new BucketListAdapter.LoadMoreListener() {
             @Override
             public void onLoadMore() {
                 AsyncTaskCompat.executeParallel(
                         new LoadBucketTask(adapter.getDataCount() / COUNT_PER_PAGE + 1));
             }
-        });
+        }, isChoosingMode);
 
         recyclerView.setAdapter(adapter);
 
@@ -115,7 +165,15 @@ public class BucketListFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Bucket> buckets) {
             if(buckets != null) {
+                if(isChoosingMode) {
+                    for(Bucket bucket : buckets) {
+                        if (chosenBucketIds.contains(bucket.id)) {
+                            bucket.isChoosing = true;
+                        }
+                    }
+                }
                 adapter.append(buckets);
+                //if size is less than count_per_page, no more buckets can be retrieved
                 adapter.setShowLoading(buckets.size() == COUNT_PER_PAGE);
             } else {
                 Snackbar.make(getView(), "Error!", Snackbar.LENGTH_LONG).show();

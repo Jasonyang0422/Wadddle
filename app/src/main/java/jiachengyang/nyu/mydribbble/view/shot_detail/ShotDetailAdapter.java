@@ -13,6 +13,7 @@ import com.facebook.drawee.interfaces.DraweeController;
 
 import jiachengyang.nyu.mydribbble.R;
 import jiachengyang.nyu.mydribbble.model.Shot;
+import jiachengyang.nyu.mydribbble.view.bucket_list.ChooseBucketActivity;
 
 public class ShotDetailAdapter extends RecyclerView.Adapter {
 
@@ -71,6 +72,13 @@ public class ShotDetailAdapter extends RecyclerView.Adapter {
                         share(v.getContext());
                     }
                 });
+
+                shotDetailInfoViewHolder.bucketButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        bucket(v.getContext());
+                    }
+                });
                 break;
         }
     }
@@ -95,5 +103,10 @@ public class ShotDetailAdapter extends RecyclerView.Adapter {
         intent.putExtra(Intent.EXTRA_TEXT, shot.title + " " + shot.html_url);
         intent.setType("text/plain");
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_shot)));
+    }
+
+    private void bucket(Context context) {
+        Intent intent = new Intent(context, ChooseBucketActivity.class);
+        context.startActivity(intent);
     }
 }

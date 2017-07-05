@@ -7,4 +7,5 @@ public class Bucket {
     public String description;
     public int shots_count;
 
+    public boolean isChoosing;
 }

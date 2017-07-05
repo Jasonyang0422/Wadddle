@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                         setTitle("Likes");
                         break;
                     case R.id.navigation_view_menu_buckets:
-                        fragment = BucketListFragment.newInstance();
+                        fragment = BucketListFragment.newInstance(false, null);
                         setTitle("Buckets");
                         break;
                 }
