@@ -11,8 +11,11 @@ import android.view.ViewGroup;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 
+import java.util.ArrayList;
+
 import jiachengyang.nyu.mydribbble.R;
 import jiachengyang.nyu.mydribbble.model.Shot;
+import jiachengyang.nyu.mydribbble.view.bucket_list.BucketListFragment;
 import jiachengyang.nyu.mydribbble.view.bucket_list.ChooseBucketActivity;
 
 public class ShotDetailAdapter extends RecyclerView.Adapter {
@@ -20,10 +23,16 @@ public class ShotDetailAdapter extends RecyclerView.Adapter {
     private static final int VIEW_TYPE_SHOT_DETAIL_IMAGE = 0;
     private static final int VIEW_TYPE_SHOT_DETAIL_INFO = 1;
 
+    private ShotDetailFragment shotDetailFragment;
     private Shot shot;
 
-    public ShotDetailAdapter(Shot shot) {
+    private ArrayList<String> collectedBucketIds;
+
+    public ShotDetailAdapter(Shot shot,
+                             ShotDetailFragment shotDetailFragment) {
         this.shot = shot;
+        this.shotDetailFragment = shotDetailFragment;
+        this.collectedBucketIds = null;
     }
 
     @Override
@@ -106,7 +115,10 @@ public class ShotDetailAdapter extends RecyclerView.Adapter {
     }
 
     private void bucket(Context context) {
-        Intent intent = new Intent(context, ChooseBucketActivity.class);
-        context.startActivity(intent);
+        if(collectedBucketIds != null) {
+            Intent intent = new Intent(context, ChooseBucketActivity.class);
+            intent.putStringArrayListExtra(BucketListFragment.KEY_CHOSEN_BUCKET_IDS, collectedBucketIds);
+            shotDetailFragment.startActivityForResult(intent, shotDetailFragment.REQ_CODE_BUCKET);
+        }
     }
 }

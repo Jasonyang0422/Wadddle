@@ -20,6 +20,7 @@ import jiachengyang.nyu.mydribbble.utils.ModelUtils;
 public class ShotDetailFragment extends Fragment {
 
     public static final String KEY_SHOT_DETAIL = "shot_detail";
+    public static final int REQ_CODE_BUCKET = 100;
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
 
@@ -43,7 +44,7 @@ public class ShotDetailFragment extends Fragment {
                 .toObject(getArguments().getString(KEY_SHOT_DETAIL), new TypeToken<Shot>(){});
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new ShotDetailAdapter(shot));
+        recyclerView.setAdapter(new ShotDetailAdapter(shot, this));
     }
 
 }
